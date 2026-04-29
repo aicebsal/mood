@@ -54,7 +54,7 @@ export default function HappyMoodApp() {
   const [cloudMoodData, setCloudMoodData] = useState<MoodData>({});
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  
+
   const [user, setUser] = useState<{ uid: string, displayName: string | null, photoURL: string | null } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export default function HappyMoodApp() {
 
   useEffect(() => {
     if (!auth) return;
-    
+
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         setUser({ uid: firebaseUser.uid, displayName: firebaseUser.displayName, photoURL: firebaseUser.photoURL });
@@ -95,7 +95,7 @@ export default function HappyMoodApp() {
   // Read data from cloud
   useEffect(() => {
     if (!user || !db) return;
-    
+
     // Solo traemos el mes actual para no traer toda la base de datos de golpe
     // Pero como Firebase rules y la forma simple aquí pide todos los moods, traemos todo:
     const moodsRef = collection(db, `users/${user.uid}/moods`);
@@ -173,7 +173,7 @@ export default function HappyMoodApp() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            
+
             {/* Indicador de estado */}
             <div className="hidden md:flex items-center gap-2 mr-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-white/5 cursor-default">
               {isSyncing ? (
@@ -189,7 +189,7 @@ export default function HappyMoodApp() {
             </div>
 
             {!user ? (
-              <button 
+              <button
                 onClick={handleLogin}
                 className="hidden lg:block px-4 py-1.5 rounded-full bg-surface-container-low text-xs font-medium text-on-surface-variant border border-outline-variant/30 hover:text-white hover:border-outline-variant transition-all"
               >
@@ -226,7 +226,7 @@ export default function HappyMoodApp() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto pt-28 px-6 grid grid-cols-1 md:grid-cols-12 gap-12">
-        <Calendar 
+        <Calendar
           currentMonth={currentMonth}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
@@ -234,7 +234,7 @@ export default function HappyMoodApp() {
           onSelectDate={setSelectedDate}
           moodData={moodData}
         />
-        <MoodForm 
+        <MoodForm
           key={selectedDate.toISOString()}
           selectedDate={selectedDate}
           entry={currentEntry}
@@ -248,13 +248,13 @@ export default function HappyMoodApp() {
           <CalendarIcon className="w-6 h-6" />
           <span className="text-[11px] font-medium mt-1">Calendario</span>
         </button>
-        <button 
+        <button
           onClick={() => setSelectedDate(new Date())}
           className="flex flex-col items-center justify-center bg-surface-container-high text-primary rounded-full p-3 shadow-lg scale-110 border border-primary/20"
         >
           <PlusCircle className="w-8 h-8" />
         </button>
-        <button 
+        <button
           onClick={user ? handleLogout : handleLogin}
           className="flex flex-col items-center justify-center text-on-surface-variant p-3 hover:bg-surface-container-high rounded-full transition-all"
         >
@@ -272,13 +272,13 @@ export default function HappyMoodApp() {
   );
 }
 
-function Calendar({ 
-  currentMonth, 
-  onPrevMonth, 
-  onNextMonth, 
-  selectedDate, 
+function Calendar({
+  currentMonth,
+  onPrevMonth,
+  onNextMonth,
+  selectedDate,
   onSelectDate,
-  moodData 
+  moodData
 }: {
   currentMonth: Date;
   onPrevMonth: () => void;
@@ -290,10 +290,10 @@ function Calendar({
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  
-  const startDay = monthStart.getDay(); 
+
+  const startDay = monthStart.getDay();
   const paddingDays = startDay === 0 ? 6 : startDay - 1;
-  
+
   return (
     <section className="md:col-span-5 flex flex-col gap-8">
       <header className="flex justify-between items-end">
@@ -312,42 +312,42 @@ function Calendar({
           </button>
         </div>
       </header>
-      
+
       <div className="grid grid-cols-7 gap-2">
         {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
           <div key={day} className="text-center text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 pb-2">
             {day}
           </div>
         ))}
-        
+
         {Array.from({ length: paddingDays }).map((_, i) => (
           <div key={`pad-${i}`} className="aspect-square"></div>
         ))}
-        
+
         {days.map(day => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const entry = moodData[dateStr];
           const isSelected = isSameDay(day, selectedDate);
-          
+
           let dayClass = "aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all ";
-          
+
           if (entry) {
             dayClass += MOOD_COLORS[entry.emoji] + " font-bold ";
             if (entry.emoji === 'increible') {
-               dayClass += " shadow-[0_0_20px_rgba(63,255,139,0.3)] ";
+              dayClass += " shadow-[0_0_20px_rgba(63,255,139,0.3)] ";
             }
           } else {
             dayClass += "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high ";
           }
-          
+
           if (isSelected && !entry) {
             dayClass += "ring-2 ring-primary bg-surface-container-high text-primary font-bold ";
           } else if (isSelected && entry) {
             dayClass += "ring-2 ring-white scale-110 z-10 ";
           }
-          
+
           return (
-            <button 
+            <button
               key={dateStr}
               onClick={() => onSelectDate(day)}
               className={dayClass}
@@ -357,12 +357,12 @@ function Calendar({
           );
         })}
       </div>
-      
+
       {/* Legends */}
       <div className="flex flex-wrap gap-4 pt-4 opacity-70">
         {Object.entries(MOOD_COLORS).map(([mood, colorClass]) => (
           <div key={mood} className="flex items-center gap-2 text-[11px] font-bold text-on-surface-variant capitalize">
-            <div className={cn("w-3 h-3 rounded-full", colorClass.split(' ')[0])}></div> 
+            <div className={cn("w-3 h-3 rounded-full", colorClass.split(' ')[0])}></div>
             {mood}
           </div>
         ))}
@@ -371,10 +371,10 @@ function Calendar({
   );
 }
 
-function MoodForm({ 
-  selectedDate, 
-  entry, 
-  onSave 
+function MoodForm({
+  selectedDate,
+  entry,
+  onSave
 }: {
   selectedDate: Date;
   entry?: MoodEntry;
@@ -388,7 +388,7 @@ function MoodForm({
 
   const handleSave = () => {
     if (!emoji) return;
-    
+
     setIsSaving(true);
     setTimeout(() => {
       onSave({
@@ -408,13 +408,13 @@ function MoodForm({
     <section className="md:col-span-7 pb-12 relative">
       <div className="bg-surface-container-low/60 backdrop-blur-xl rounded-[40px] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-white/5">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
-        
+
         <header className="mb-12">
           <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-2 block">
             {isToday(selectedDate) ? `Hoy es ${dateStr}` : dateStr}
           </span>
           <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-white">
-            {isToday(selectedDate) ? '¿Cómo te sientes hoy?' : '¿Cómo te sentiste?'}
+            {isToday(selectedDate) ? '¿Cómo estás hoy? dime como te sientes' : '¿Cómo te sentiste?'}
           </h1>
         </header>
 
@@ -423,15 +423,15 @@ function MoodForm({
           <div>
             <div className="flex justify-between items-center gap-2 md:gap-4 overflow-x-auto pb-4 no-scrollbar">
               {(Object.keys(MOOD_EMOJIS) as Array<MoodType>).map((m) => (
-                <button 
+                <button
                   key={m}
                   onClick={() => setEmoji(m)}
                   className="group flex flex-col items-center gap-3 min-w-[70px]"
                 >
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    animate={{ 
+                    animate={{
                       scale: emoji === m ? 1.1 : 1,
                       backgroundColor: emoji === m ? MOOD_HEX[m] + '33' : '#20201f',
                       borderColor: emoji === m ? MOOD_HEX[m] : 'transparent'
@@ -443,7 +443,7 @@ function MoodForm({
                   >
                     {MOOD_EMOJIS[m]}
                   </motion.div>
-                  <span 
+                  <span
                     className={cn(
                       "text-[10px] font-bold uppercase tracking-widest transition-colors",
                       emoji === m ? "" : "text-on-surface-variant group-hover:text-white"
@@ -463,11 +463,11 @@ function MoodForm({
               <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-4 pl-1 group-focus-within:text-primary transition-colors">
                 {isToday(selectedDate) ? '¿Qué ha pasado hoy?' : '¿Qué pasó este día?'}
               </label>
-              <textarea 
+              <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="w-full bg-transparent border-none p-0 focus:ring-0 text-2xl font-body text-white placeholder:text-on-surface-variant/20 resize-none min-h-[120px] outline-none" 
-                maxLength={150} 
+                className="w-full bg-transparent border-none p-0 focus:ring-0 text-2xl font-body text-white placeholder:text-on-surface-variant/20 resize-none min-h-[120px] outline-none"
+                maxLength={150}
                 placeholder="Escribe tus pensamientos aquí..."
               />
               <div className="h-px w-full bg-outline-variant/20 mt-2 group-focus-within:bg-primary/50 transition-colors"></div>
@@ -479,13 +479,13 @@ function MoodForm({
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant pl-1">Energía</label>
                 <div className="flex gap-2">
                   {['baja', 'media', 'alta'].map((lvl) => (
-                    <button 
+                    <button
                       key={lvl}
                       onClick={() => setEnergy(lvl as EnergyType)}
                       className={cn(
                         "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all",
-                        energy === lvl 
-                          ? "bg-primary text-on-primary" 
+                        energy === lvl
+                          ? "bg-primary text-on-primary"
                           : "border border-outline-variant/30 text-on-surface-variant hover:border-primary/50 hover:text-primary"
                       )}
                     >
@@ -498,13 +498,13 @@ function MoodForm({
               {/* One Word */}
               <div className="space-y-4">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant pl-1">Una palabra</label>
-                <input 
+                <input
                   type="text"
                   value={word}
                   onChange={(e) => setWord(e.target.value)}
-                  className="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-primary/20 outline-none" 
-                  maxLength={30} 
-                  placeholder="Ej: Calma" 
+                  className="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 text-sm font-medium text-white focus:ring-2 focus:ring-primary/20 outline-none"
+                  maxLength={30}
+                  placeholder="Ej: Calma"
                 />
               </div>
             </div>
@@ -512,15 +512,15 @@ function MoodForm({
 
           {/* CTA */}
           <div className="pt-8">
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSave}
               disabled={!emoji || isSaving}
               className={cn(
                 "w-full md:w-auto px-12 py-5 rounded-full font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300",
-                emoji 
-                  ? "bg-gradient-to-r from-primary to-primary-container text-on-primary shadow-[0_20px_40px_rgba(63,255,139,0.2)] hover:shadow-[0_25px_50px_rgba(63,255,139,0.3)]" 
+                emoji
+                  ? "bg-gradient-to-r from-primary to-primary-container text-on-primary shadow-[0_20px_40px_rgba(63,255,139,0.2)] hover:shadow-[0_25px_50px_rgba(63,255,139,0.3)]"
                   : "bg-surface-container-high text-on-surface-variant cursor-not-allowed",
                 isSaving && "animate-pulse"
               )}
